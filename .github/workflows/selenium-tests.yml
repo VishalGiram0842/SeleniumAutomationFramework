@@ -57,7 +57,7 @@ jobs:
       - name: Run Selenium Tests
         run: |
           mvn clean test \
-            -Dbrowser=chrome \
+            -Dbrowser=edge \
             -Dheadless=true
         continue-on-error: true
 
