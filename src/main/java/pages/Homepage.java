@@ -25,7 +25,9 @@ public class Homepage {
 		this.driver = driver;
 	}
 	
-	public void validateHomepageContent() {
+	public void validateHomepageContent() throws InterruptedException {
+		Thread.sleep(20000);
+		System.out.println(driver.getCurrentUrl());
 		ExpectedConditions.elementToBeClickable(catagoryLnk);
 		String text = catagoryLnk.getText();
 		System.out.println(text);
