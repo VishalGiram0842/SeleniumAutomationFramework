@@ -1,20 +1,20 @@
 package utilities;
 
 import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.MediaEntityBuilder;
+import com.aventstack.extentreports.Status;
 
 import io.qameta.allure.Allure;
-import io.qameta.allure.Attachment;
-import io.qameta.allure.Step;
 
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
-import org.testng.*;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
 
-import java.io.ByteArrayInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 
 public class Listeners implements ITestListener {
 
@@ -64,19 +64,20 @@ public class Listeners implements ITestListener {
 
 		ExtentTest test = getExtentTest();
 
-		if (test == null) {
-			return;
-		}
-
 		String testName = result.getMethod().getMethodName();
 
-		test.pass("TEST PASSED");
+		if (test != null) {
 
-		test.pass("Test completed successfully: " + testName);
+			test.pass("TEST PASSED");
 
-		captureAndAttachScreenshot(result, "PASS");
+			test.pass("Test completed successfully: " + testName);
+
+			captureExtentScreenshot(result, "PASS");
+		}
 
 		Allure.step("TEST PASSED: " + testName);
+
+		attachAllureScreenshot("PASS Screenshot");
 
 		cleanup();
 	}
@@ -106,10 +107,10 @@ public class Listeners implements ITestListener {
 
 				test.fail("Error Message: " + throwable.getMessage());
 
-				test.fail("Stack Trace: " + getStackTrace(throwable));
+				test.fail("Stack Trace:<pre>" + getStackTrace(throwable) + "</pre>");
 			}
 
-			captureAndAttachScreenshot(result, "FAIL");
+			captureExtentScreenshot(result, "FAIL");
 		}
 
 		// Allure
@@ -119,10 +120,13 @@ public class Listeners implements ITestListener {
 
 			Allure.addAttachment("Exception", "text/plain", throwable.toString());
 
+			Allure.addAttachment("Error Message", "text/plain",
+					throwable.getMessage() == null ? "" : throwable.getMessage());
+
 			Allure.addAttachment("Stack Trace", "text/plain", getStackTrace(throwable));
 		}
 
-		attachAllureScreenshot();
+		attachAllureScreenshot("FAIL Screenshot");
 
 		cleanup();
 	}
@@ -159,7 +163,7 @@ public class Listeners implements ITestListener {
 	}
 
 	// =========================================================
-	// TEST FAILED BUT WITHIN SUCCESS PERCENTAGE
+	// FAILED WITHIN SUCCESS PERCENTAGE
 	// =========================================================
 
 	@Override
@@ -169,10 +173,10 @@ public class Listeners implements ITestListener {
 
 		if (test != null) {
 
-			test.warning("Test failed but is within " + "success percentage");
+			test.warning("Test failed but is within " + "success percentage.");
 		}
 
-		Allure.step("Test failed but is within " + "success percentage");
+		Allure.step("Test failed but is within " + "success percentage.");
 	}
 
 	// =========================================================
@@ -218,7 +222,7 @@ public class Listeners implements ITestListener {
 	}
 
 	// =========================================================
-	// HELPER - GET EXTENT TEST
+	// GET EXTENT TEST
 	// =========================================================
 
 	public static ExtentTest getExtentTest() {
@@ -227,7 +231,7 @@ public class Listeners implements ITestListener {
 	}
 
 	// =========================================================
-	// CENTRALIZED INFO LOG
+	// INFO LOG
 	// =========================================================
 
 	public static void logInfo(String message) {
@@ -235,6 +239,7 @@ public class Listeners implements ITestListener {
 		ExtentTest test = getExtentTest();
 
 		if (test != null) {
+
 			test.info(message);
 		}
 
@@ -244,7 +249,7 @@ public class Listeners implements ITestListener {
 	}
 
 	// =========================================================
-	// CENTRALIZED PASS LOG
+	// PASS LOG
 	// =========================================================
 
 	public static void logPass(String message) {
@@ -252,6 +257,7 @@ public class Listeners implements ITestListener {
 		ExtentTest test = getExtentTest();
 
 		if (test != null) {
+
 			test.pass(message);
 		}
 
@@ -261,7 +267,7 @@ public class Listeners implements ITestListener {
 	}
 
 	// =========================================================
-	// CENTRALIZED WARNING LOG
+	// WARNING LOG
 	// =========================================================
 
 	public static void logWarning(String message) {
@@ -269,6 +275,7 @@ public class Listeners implements ITestListener {
 		ExtentTest test = getExtentTest();
 
 		if (test != null) {
+
 			test.warning(message);
 		}
 
@@ -278,7 +285,7 @@ public class Listeners implements ITestListener {
 	}
 
 	// =========================================================
-	// CENTRALIZED ERROR LOG
+	// ERROR LOG
 	// =========================================================
 
 	public static void logError(String message) {
@@ -286,6 +293,7 @@ public class Listeners implements ITestListener {
 		ExtentTest test = getExtentTest();
 
 		if (test != null) {
+
 			test.fail(message);
 		}
 
@@ -295,14 +303,15 @@ public class Listeners implements ITestListener {
 	}
 
 	// =========================================================
-	// SCREENSHOT - EXTENT + ALLURE
+	// EXTENT SCREENSHOT
 	// =========================================================
 
-	private void captureAndAttachScreenshot(ITestResult result, String status) {
+	private void captureExtentScreenshot(ITestResult result, String status) {
 
-		WebDriver driver = DriverFactory.getDriver();
+		WebDriver driver = getDriverSafely();
 
 		if (driver == null) {
+
 			return;
 		}
 
@@ -318,7 +327,9 @@ public class Listeners implements ITestListener {
 
 				if (test != null) {
 
-					test.log(status.equals("FAIL") ? Status.FAIL : Status.PASS, "Screenshot - " + status,
+					Status reportStatus = status.equalsIgnoreCase("FAIL") ? Status.FAIL : Status.PASS;
+
+					test.log(reportStatus, "Screenshot - " + status,
 							MediaEntityBuilder.createScreenCaptureFromPath(screenshotPath).build());
 				}
 			}
@@ -333,23 +344,44 @@ public class Listeners implements ITestListener {
 	// ALLURE SCREENSHOT
 	// =========================================================
 
-	@Attachment(value = "Screenshot", type = "image/png")
-	private byte[] attachAllureScreenshot() {
+	private void attachAllureScreenshot(String attachmentName) {
 
-		WebDriver driver = DriverFactory.getDriver();
+		WebDriver driver = getDriverSafely();
 
 		if (driver == null) {
-			return new byte[0];
+
+			return;
 		}
 
 		try {
 
-			return ((org.openqa.selenium.TakesScreenshot) driver).getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
+			byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+
+			Allure.addAttachment(attachmentName, "image/png", new java.io.ByteArrayInputStream(screenshot), ".png");
 
 		} catch (Exception e) {
 
-			return new byte[0];
+			Allure.addAttachment("Screenshot Error", "text/plain", e.getMessage() == null ? "" : e.getMessage());
 		}
+	}
+
+	// =========================================================
+	// GET DRIVER SAFELY
+	// =========================================================
+
+	private WebDriver getDriverSafely() {
+
+		try {
+
+			if (DriverFactory.isDriverInitialized()) {
+
+				return DriverFactory.getDriver();
+			}
+
+		} catch (Exception ignored) {
+		}
+
+		return null;
 	}
 
 	// =========================================================
@@ -373,9 +405,6 @@ public class Listeners implements ITestListener {
 	// =========================================================
 
 	private void cleanup() {
-
-		// Do NOT quit WebDriver here if
-		// your @AfterMethod handles driver cleanup.
 
 		extentTest.remove();
 	}

@@ -3,37 +3,35 @@ name: Selenium Automation Tests
 on:
   push:
     branches:
-      - main
-      - develop
+      - master
 
   pull_request:
     branches:
-      - main
-      - develop
+      - master
 
   workflow_dispatch:
 
 jobs:
 
-  selenium-tests:
-
-    name: Selenium TestNG Tests
+  test:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      # ----------------------------------------
-      # 1. Checkout Repository
-      # ----------------------------------------
+      # =====================================================
+      # CHECKOUT
+      # =====================================================
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
 
-      # ----------------------------------------
-      # 2. Setup Java
-      # ----------------------------------------
-      - name: Setup Java 17
+      # =====================================================
+      # JAVA
+      # =====================================================
+
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -41,43 +39,42 @@ jobs:
           cache: maven
 
 
-      # ----------------------------------------
-      # 3. Verify Java & Maven
-      # ----------------------------------------
+      # =====================================================
+      # VERIFY JAVA
+      # =====================================================
+
       - name: Verify Java
-        run: java -version
+        run: |
+          java -version
+          mvn -version
 
-      - name: Verify Maven
-        run: mvn -version
 
+      # =====================================================
+      # RUN TESTS
+      # =====================================================
 
-      # ----------------------------------------
-      # 4. Run Selenium Tests
-      # ----------------------------------------
       - name: Run Selenium Tests
         run: |
           mvn clean test \
             -Dbrowser=chrome \
             -Dheadless=true
-        continue-on-error: true
 
 
-      # ----------------------------------------
-      # 5. Display Report Files
-      # ----------------------------------------
+      # =====================================================
+      # SHOW REPORT FILES
+      # =====================================================
+
       - name: List Reports
         if: always()
         run: |
           echo "===== Reports ====="
-          find Reports -maxdepth 3 -type f || true
-
-          echo "===== Allure Results ====="
-          find Reports/allure-results -type f || true
+          find Reports -maxdepth 4 -type f || true
 
 
-      # ----------------------------------------
-      # 6. Upload Extent Report
-      # ----------------------------------------
+      # =====================================================
+      # UPLOAD EXTENT REPORT
+      # =====================================================
+
       - name: Upload Extent Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -87,9 +84,10 @@ jobs:
           if-no-files-found: warn
 
 
-      # ----------------------------------------
-      # 7. Upload Allure Results
-      # ----------------------------------------
+      # =====================================================
+      # UPLOAD ALLURE RESULTS
+      # =====================================================
+
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -99,13 +97,14 @@ jobs:
           if-no-files-found: warn
 
 
-      # ----------------------------------------
-      # 8. Upload Screenshots
-      # ----------------------------------------
+      # =====================================================
+      # UPLOAD SCREENSHOTS
+      # =====================================================
+
       - name: Upload Screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-screenshots
-          path: Reports/**/*.png
-          if-no-files-found: ignore
+          name: screenshots
+          path: Reports/screenshots
+          if-no-files-found: warn

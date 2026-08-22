@@ -7,9 +7,9 @@ import utilities.BaseClass;
 
 public class sampleTest extends BaseClass {
 
-	@Test
+	@Test(description = "Validate Maven Repository homepage search")
 	public void simpleTest() {
-		Homepage hp = new Homepage(driver);
-	//	hp.validateHomepageContent();
+		Homepage homepage = new Homepage(driver);
+		homepage.validateHomepageContent();
 	}
 }
