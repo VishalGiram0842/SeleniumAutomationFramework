@@ -5,7 +5,9 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 
 public final class ExtentManager {
@@ -36,99 +38,131 @@ public final class ExtentManager {
 
         if (extent == null) {
 
-            try {
-
-                // Clean old Reports folder
-                cleanReportsFolder();
-
-                // Create fresh Reports folder
-                createReportsFolder();
-
-            } catch (IOException e) {
-
-                throw new RuntimeException(
-                        "Unable to prepare Reports folder", e);
-            }
-
-
-            // Create Extent Spark Reporter
-            ExtentSparkReporter sparkReporter =
-                    new ExtentSparkReporter(REPORT_FILE);
-
-
-            // =================================================
-            // REPORT CONFIGURATION
-            // =================================================
-
-            sparkReporter.config().setDocumentTitle(
-                    "Automation Test Report");
-
-            sparkReporter.config().setReportName(
-                    "Selenium TestNG Automation Report");
-
-            sparkReporter.config().setTimeStampFormat(
-                    "dd-MM-yyyy HH:mm:ss");
-
-
-            // =================================================
-            // CREATE EXTENT REPORT
-            // =================================================
-
-            extent = new ExtentReports();
-
-            extent.attachReporter(sparkReporter);
-
-
-            // =================================================
-            // SYSTEM INFORMATION
-            // =================================================
-
-            extent.setSystemInfo(
-                    "Framework",
-                    "Selenium + TestNG");
-
-            extent.setSystemInfo(
-                    "Language",
-                    "Java");
-
-            extent.setSystemInfo(
-                    "Build Tool",
-                    "Maven");
-
-            extent.setSystemInfo(
-                    "Operating System",
-                    System.getProperty("os.name"));
-
-            extent.setSystemInfo(
-                    "OS Version",
-                    System.getProperty("os.version"));
-
-            extent.setSystemInfo(
-                    "Java Version",
-                    System.getProperty("java.version"));
-
-            extent.setSystemInfo(
-                    "Java Vendor",
-                    System.getProperty("java.vendor"));
-
-            extent.setSystemInfo(
-                    "User",
-                    System.getProperty("user.name"));
-
-            extent.setSystemInfo(
-                    "Browser",
-                    System.getProperty(
-                            "browser",
-                            "Configured in config.properties"));
-
-            extent.setSystemInfo(
-                    "Headless",
-                    System.getProperty(
-                            "headless",
-                            "false"));
+            initializeReport();
         }
 
         return extent;
+    }
+
+
+    // =========================================================
+    // INITIALIZE REPORT
+    // =========================================================
+
+    private static void initializeReport() {
+
+        try {
+
+            cleanReportsFolder();
+
+            createReportsFolder();
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Unable to prepare Reports folder.",
+                    e);
+        }
+
+
+        ExtentSparkReporter sparkReporter =
+                new ExtentSparkReporter(REPORT_FILE);
+
+
+        // =====================================================
+        // REPORT CONFIGURATION
+        // =====================================================
+
+        sparkReporter.config()
+                .setDocumentTitle(
+                        "Automation Test Report");
+
+        sparkReporter.config()
+                .setReportName(
+                        "Selenium TestNG Automation Report");
+
+        sparkReporter.config()
+                .setTimeStampFormat(
+                        "dd-MM-yyyy HH:mm:ss");
+
+
+        // =====================================================
+        // CREATE EXTENT
+        // =====================================================
+
+        extent = new ExtentReports();
+
+        extent.attachReporter(sparkReporter);
+
+
+        // =====================================================
+        // SYSTEM INFORMATION
+        // =====================================================
+
+        extent.setSystemInfo(
+                "Framework",
+                "Selenium + TestNG");
+
+        extent.setSystemInfo(
+                "Language",
+                "Java");
+
+        extent.setSystemInfo(
+                "Build Tool",
+                "Maven");
+
+        extent.setSystemInfo(
+                "Operating System",
+                System.getProperty("os.name"));
+
+        extent.setSystemInfo(
+                "OS Version",
+                System.getProperty("os.version"));
+
+        extent.setSystemInfo(
+                "Architecture",
+                System.getProperty("os.arch"));
+
+        extent.setSystemInfo(
+                "Java Version",
+                System.getProperty("java.version"));
+
+        extent.setSystemInfo(
+                "Java Vendor",
+                System.getProperty("java.vendor"));
+
+        extent.setSystemInfo(
+                "User",
+                System.getProperty("user.name"));
+
+        extent.setSystemInfo(
+                "Browser",
+                System.getProperty(
+                        "browser",
+                        BaseClass.properties.getProperty(
+                                "Browser")));
+
+        extent.setSystemInfo(
+                "Headless",
+                System.getProperty(
+                        "headless",
+                        BaseClass.properties.getProperty(
+                                "Headless")));
+
+        extent.setSystemInfo(
+                "URL",
+                System.getProperty(
+                        "url",
+                        BaseClass.properties.getProperty(
+                                "URL")));
+
+
+        System.out.println(
+                "Extent Report initialized.");
+
+        System.out.println(
+                "Report location: "
+                        + REPORT_FILE);
     }
 
 
@@ -148,6 +182,7 @@ public final class ExtentManager {
             System.out.println(
                     "Cleaning existing Reports folder...");
 
+
             Files.walk(reportsPath)
                     .sorted(
                             Comparator.reverseOrder())
@@ -166,6 +201,7 @@ public final class ExtentManager {
                         }
                     });
 
+
             System.out.println(
                     "Existing Reports folder cleaned.");
         }
@@ -182,11 +218,15 @@ public final class ExtentManager {
         Path reportsPath =
                 Paths.get(REPORTS_FOLDER);
 
-        Files.createDirectories(reportsPath);
+
+        Files.createDirectories(
+                reportsPath);
+
 
         System.out.println(
                 "Reports folder created at: "
-                        + reportsPath.toAbsolutePath());
+                        + reportsPath
+                        .toAbsolutePath());
     }
 
 
@@ -201,10 +241,26 @@ public final class ExtentManager {
             extent.flush();
 
             System.out.println(
-                    "Extent Report generated successfully:");
+                    "========================================");
+
+            System.out.println(
+                    "Extent Report generated successfully.");
 
             System.out.println(
                     REPORT_FILE);
+
+            System.out.println(
+                    "========================================");
         }
+    }
+
+
+    // =========================================================
+    // GET REPORT PATH
+    // =========================================================
+
+    public static String getReportPath() {
+
+        return REPORT_FILE;
     }
 }

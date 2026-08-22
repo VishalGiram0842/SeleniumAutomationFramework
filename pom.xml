@@ -9,178 +9,234 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>SeleniumAutomationFramework</groupId>
-
     <artifactId>SeleniumAutomationFramework</artifactId>
-
     <version>0.0.1-SNAPSHOT</version>
 
+    <!-- ===================================================== -->
+    <!-- PROJECT PROPERTIES                                    -->
+    <!-- ===================================================== -->
 
     <properties>
 
         <maven.compiler.source>17</maven.compiler.source>
-
         <maven.compiler.target>17</maven.compiler.target>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- TestNG configuration -->
+        <testng.version>7.12.0</testng.version>
+
+        <!-- Selenium -->
+        <selenium.version>4.37.0</selenium.version>
+
+        <!-- WebDriverManager -->
+        <webdrivermanager.version>6.3.3</webdrivermanager.version>
+
+        <!-- Extent -->
+        <extent.version>5.1.2</extent.version>
+
+        <!-- Allure -->
+        <allure.version>2.29.1</allure.version>
+
+        <!-- Apache POI -->
+        <poi.version>5.5.1</poi.version>
+
+        <!-- Commons IO -->
+        <commons-io.version>2.21.0</commons-io.version>
+
+        <!-- Surefire -->
+        <surefire.version>3.5.3</surefire.version>
+
+        <!-- Compiler -->
+        <compiler.version>3.13.0</compiler.version>
+
     </properties>
 
 
+    <!-- ===================================================== -->
+    <!-- DEPENDENCIES                                          -->
+    <!-- ===================================================== -->
+
     <dependencies>
 
-
-        <!-- ============================================= -->
-        <!-- SELENIUM                                      -->
-        <!-- ============================================= -->
+        <!-- ================================================= -->
+        <!-- SELENIUM                                           -->
+        <!-- ================================================= -->
 
         <dependency>
-
             <groupId>org.seleniumhq.selenium</groupId>
-
             <artifactId>selenium-java</artifactId>
-
-            <version>4.37.0</version>
-
+            <version>${selenium.version}</version>
         </dependency>
 
 
-        <!-- ============================================= -->
-        <!-- TESTNG                                        -->
-        <!-- ============================================= -->
+        <!-- ================================================= -->
+        <!-- TESTNG                                             -->
+        <!-- ================================================= -->
+
+        <!--
+            IMPORTANT:
+            Do NOT use <scope>test</scope> here because
+            BaseClass and Listeners are currently under
+            src/main/java and use TestNG classes.
+        -->
 
         <dependency>
-
             <groupId>org.testng</groupId>
-
             <artifactId>testng</artifactId>
-
-            <version>7.12.0</version>
-
+            <version>${testng.version}</version>
         </dependency>
 
 
-        <!-- ============================================= -->
-        <!-- WEBDRIVER MANAGER                             -->
-        <!-- ============================================= -->
+        <!-- ================================================= -->
+        <!-- WEBDRIVER MANAGER                                  -->
+        <!-- ================================================= -->
 
         <dependency>
-
             <groupId>io.github.bonigarcia</groupId>
-
             <artifactId>webdrivermanager</artifactId>
-
-            <version>6.3.3</version>
-
+            <version>${webdrivermanager.version}</version>
         </dependency>
 
 
-        <!-- ============================================= -->
-        <!-- EXTENT REPORTS                                -->
-        <!-- ============================================= -->
+        <!-- ================================================= -->
+        <!-- EXTENT REPORTS                                     -->
+        <!-- ================================================= -->
 
         <dependency>
-
             <groupId>com.aventstack</groupId>
-
             <artifactId>extentreports</artifactId>
-
-            <version>5.1.2</version>
-
+            <version>${extent.version}</version>
         </dependency>
 
 
-        <!-- ============================================= -->
-        <!-- ALLURE TESTNG                                 -->
-        <!-- ============================================= -->
+        <!-- ================================================= -->
+        <!-- ALLURE TESTNG                                      -->
+        <!-- ================================================= -->
 
         <dependency>
-
             <groupId>io.qameta.allure</groupId>
-
             <artifactId>allure-testng</artifactId>
-
-            <version>2.29.1</version>
-
+            <version>${allure.version}</version>
         </dependency>
 
 
-        <!-- ============================================= -->
-        <!-- APACHE POI                                    -->
-        <!-- ============================================= -->
+        <!-- ================================================= -->
+        <!-- APACHE POI                                         -->
+        <!-- ================================================= -->
 
         <dependency>
-
             <groupId>org.apache.poi</groupId>
-
             <artifactId>poi</artifactId>
-
-            <version>5.5.1</version>
-
+            <version>${poi.version}</version>
         </dependency>
 
 
-        <!-- ============================================= -->
-        <!-- COMMONS IO                                    -->
-        <!-- ============================================= -->
+        <!-- ================================================= -->
+        <!-- COMMONS IO                                         -->
+        <!-- ================================================= -->
 
         <dependency>
-
             <groupId>commons-io</groupId>
-
             <artifactId>commons-io</artifactId>
-
-            <version>2.21.0</version>
-
+            <version>${commons-io.version}</version>
         </dependency>
-
 
     </dependencies>
 
 
-    <!-- ============================================= -->
-    <!-- BUILD                                         -->
-    <!-- ============================================= -->
+    <!-- ===================================================== -->
+    <!-- BUILD                                                  -->
+    <!-- ===================================================== -->
 
     <build>
 
         <plugins>
 
+            <!-- ================================================= -->
+            <!-- MAVEN COMPILER PLUGIN                              -->
+            <!-- ================================================= -->
+
             <plugin>
 
                 <groupId>org.apache.maven.plugins</groupId>
-
                 <artifactId>maven-compiler-plugin</artifactId>
-
-                <version>3.13.0</version>
+                <version>${compiler.version}</version>
 
                 <configuration>
 
-                    <source>17</source>
+                    <source>${maven.compiler.source}</source>
 
-                    <target>17</target>
+                    <target>${maven.compiler.target}</target>
+
+                    <encoding>${project.build.sourceEncoding}</encoding>
 
                 </configuration>
 
             </plugin>
 
 
+            <!-- ================================================= -->
+            <!-- MAVEN SUREFIRE PLUGIN                              -->
+            <!-- ================================================= -->
+
             <plugin>
 
                 <groupId>org.apache.maven.plugins</groupId>
-
                 <artifactId>maven-surefire-plugin</artifactId>
-
-                <version>3.5.3</version>
+                <version>${surefire.version}</version>
 
                 <configuration>
+
+                    <!--
+                        ALWAYS execute this TestNG suite.
+                        This makes CI execution predictable.
+                    -->
 
                     <suiteXmlFiles>
 
                         <suiteXmlFile>
-                            testng.xml
+                            ${project.basedir}/testng.xml
                         </suiteXmlFile>
 
                     </suiteXmlFiles>
+
+
+                    <!--
+                        Do not skip tests.
+                    -->
+
+                    <skipTests>false</skipTests>
+
+
+                    <!--
+                        Continue collecting results but
+                        Maven will still fail when tests fail.
+                    -->
+
+                    <testFailureIgnore>false</testFailureIgnore>
+
+
+                    <!--
+                        Useful for CI.
+                    -->
+
+                    <systemPropertyVariables>
+
+                        <allure.results.directory>
+                            ${project.basedir}/Reports/allure-results
+                        </allure.results.directory>
+
+                    </systemPropertyVariables>
+
+
+                    <!--
+                        Pass JVM properties to the tests.
+                    -->
+
+                    <argLine>
+                        -Dfile.encoding=UTF-8
+                    </argLine>
 
                 </configuration>
 

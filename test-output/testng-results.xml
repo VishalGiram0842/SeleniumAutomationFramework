@@ -2,24 +2,24 @@
 <testng-results ignored="0" total="1" passed="1" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2026-08-22T23:41:15 IST" name="Default suite" finished-at="2026-08-22T23:41:41 IST" duration-ms="25275">
+  <suite started-at="2026-08-23T01:36:15 IST" name="Default suite" finished-at="2026-08-23T01:38:42 IST" duration-ms="146957">
     <groups>
     </groups>
-    <test started-at="2026-08-22T23:41:15 IST" name="Default test" finished-at="2026-08-22T23:41:41 IST" duration-ms="25275">
+    <test started-at="2026-08-23T01:36:15 IST" name="Default test" finished-at="2026-08-23T01:38:42 IST" duration-ms="146957">
       <class name="tests.sampleTest">
-        <test-method is-config="true" signature="readProperties()[pri:0, instance:tests.sampleTest@45efd90f]" started-at="2026-08-22T23:41:15 IST" name="readProperties" finished-at="2026-08-22T23:41:15 IST" duration-ms="256" status="PASS">
+        <test-method is-config="true" signature="readProperties()[pri:0, instance:tests.sampleTest@4ee203eb]" started-at="2026-08-23T01:36:15 IST" name="readProperties" finished-at="2026-08-23T01:36:15 IST" duration-ms="97" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- readProperties -->
-        <test-method is-config="true" signature="startBrowser()[pri:0, instance:tests.sampleTest@45efd90f]" started-at="2026-08-22T23:41:17 IST" name="startBrowser" finished-at="2026-08-22T23:41:28 IST" duration-ms="11493" status="PASS">
+        <test-method is-config="true" signature="startBrowser()[pri:0, instance:tests.sampleTest@4ee203eb]" started-at="2026-08-23T01:36:17 IST" name="startBrowser" finished-at="2026-08-23T01:36:45 IST" duration-ms="28752" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- startBrowser -->
-        <test-method signature="simpleTest()[pri:0, instance:tests.sampleTest@45efd90f]" started-at="2026-08-22T23:41:29 IST" name="simpleTest" finished-at="2026-08-22T23:41:33 IST" duration-ms="4208" status="PASS">
+        <test-method signature="simpleTest()[pri:0, instance:tests.sampleTest@4ee203eb]" started-at="2026-08-23T01:36:48 IST" name="simpleTest" description="Validate Maven Repository homepage search" finished-at="2026-08-23T01:38:01 IST" duration-ms="72452" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- simpleTest -->
-        <test-method is-config="true" signature="closeBrowser()[pri:0, instance:tests.sampleTest@45efd90f]" started-at="2026-08-22T23:41:37 IST" name="closeBrowser" finished-at="2026-08-22T23:41:41 IST" duration-ms="3691" status="PASS">
+        <test-method is-config="true" signature="closeBrowser()[pri:0, instance:tests.sampleTest@4ee203eb]" started-at="2026-08-23T01:38:09 IST" name="closeBrowser" finished-at="2026-08-23T01:38:42 IST" duration-ms="32332" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- closeBrowser -->

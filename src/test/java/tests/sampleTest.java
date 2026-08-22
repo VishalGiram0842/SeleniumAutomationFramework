@@ -7,9 +7,9 @@ import utilities.BaseClass;
 
 public class sampleTest extends BaseClass {
 
-	@Test
-	public void simpleTest() throws InterruptedException {
-		Homepage hp = new Homepage(driver);
-		hp.validateHomepageContent();
+	@Test(description = "Validate Maven Repository homepage search")
+	public void simpleTest() {
+		Homepage homepage = new Homepage(driver);
+		homepage.validateHomepageContent();
 	}
 }

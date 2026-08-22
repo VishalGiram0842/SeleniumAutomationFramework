@@ -4,35 +4,71 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
+
+import utilities.Listeners;
 
 public class Homepage {
 
-	WebDriver driver;
+	private final WebDriver driver;
 
-	@FindBy(xpath = "(//a[@href=\"/open-source\"])[1]")
-	private WebElement catagoryLnk;
-	
-	@FindBy(xpath = "//input[@value=\"Search\"]")
-	private WebElement searchBtn;
-	
+	// =========================================================
+	// LOCATORS
+	// =========================================================
+
+	@FindBy(xpath = "//a[@href='/open-source' and text()='Categories']")
+	private WebElement categoryLink;
+
+	@FindBy(xpath = "//input[@value='Search']")
+	private WebElement searchButton;
+
 	@FindBy(id = "query")
-	private WebElement typeTextBox;
+	private WebElement searchTextBox;
+
+	// =========================================================
+	// CONSTRUCTOR
+	// =========================================================
 
 	public Homepage(WebDriver driver) {
-		PageFactory.initElements(driver, this);
+
 		this.driver = driver;
+
+		PageFactory.initElements(driver, this);
 	}
-	
-	public void validateHomepageContent() throws InterruptedException {
-		Thread.sleep(20000);
-		System.out.println(driver.getCurrentUrl());
-		ExpectedConditions.elementToBeClickable(catagoryLnk);
-		String text = catagoryLnk.getText();
-		System.out.println(text);
-		Assert.assertEquals("Categories", text);
-		typeTextBox.sendKeys("Selenium");
-		searchBtn.click();
+
+	// =========================================================
+	// VALIDATE HOMEPAGE
+	// =========================================================
+
+	public void validateHomepageContent() {
+
+		String currentUrl = driver.getCurrentUrl();
+
+		Listeners.logInfo("Current URL: " + currentUrl);
+
+		Assert.assertTrue(currentUrl.contains("mvnrepository.com"),
+				"Homepage URL validation failed. " + "Actual URL: " + currentUrl);
+
+		Listeners.logPass("Homepage URL validated successfully.");
+
+		// =====================================================
+		// SEARCH
+		// =====================================================
+
+		Listeners.logInfo("Entering 'Selenium' into search box.");
+
+		Assert.assertTrue(searchTextBox.isDisplayed(), "Search text box is not displayed.");
+
+		searchTextBox.sendKeys("Selenium");
+
+		Listeners.logPass("Search text entered successfully.");
+
+		Listeners.logInfo("Clicking Search button.");
+
+		Assert.assertTrue(searchButton.isDisplayed(), "Search button is not displayed.");
+
+		searchButton.click();
+
+		Listeners.logPass("Search button clicked successfully.");
 	}
 }

@@ -17,60 +17,155 @@ public final class DriverFactory {
     private static final ThreadLocal<WebDriver> driver =
             new ThreadLocal<>();
 
-    public static void initializeDriver(String browser, boolean headless) {
+
+    // =========================================================
+    // INITIALIZE DRIVER
+    // =========================================================
+
+    public static void initializeDriver(
+            String browser,
+            boolean headless) {
 
         WebDriver webDriver;
 
         if (browser.equalsIgnoreCase("chrome")) {
 
+            System.out.println(
+                    "Initializing Chrome browser...");
+
             WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
 
-            if (headless) {
-                options.addArguments("--headless=new");
-                options.addArguments("--no-sandbox");
-                options.addArguments("--disable-dev-shm-usage");
-                options.addArguments("--window-size=1920,1080");
-            }
+            configureChromeOptions(options, headless);
 
             webDriver = new ChromeDriver(options);
 
         } else if (browser.equalsIgnoreCase("edge")) {
 
+            System.out.println(
+                    "Initializing Edge browser...");
+
             WebDriverManager.edgedriver().setup();
 
             EdgeOptions options = new EdgeOptions();
 
-            if (headless) {
-                options.addArguments("--headless=new");
-                options.addArguments("--no-sandbox");
-                options.addArguments("--disable-dev-shm-usage");
-                options.addArguments("--window-size=1920,1080");
-            }
+            configureEdgeOptions(options, headless);
 
             webDriver = new EdgeDriver(options);
 
         } else {
 
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     "Unsupported browser: " + browser);
         }
 
         driver.set(webDriver);
+
+        System.out.println(
+                "WebDriver initialized successfully.");
     }
 
-    public static WebDriver getDriver() {
-        return driver.get();
+
+    // =========================================================
+    // CHROME OPTIONS
+    // =========================================================
+
+    private static void configureChromeOptions(
+            ChromeOptions options,
+            boolean headless) {
+
+        if (headless) {
+
+            options.addArguments("--headless=new");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--window-size=1920,1080");
+        }
+
+        options.addArguments("--disable-notifications");
+        options.addArguments("--start-maximized");
     }
+
+
+    // =========================================================
+    // EDGE OPTIONS
+    // =========================================================
+
+    private static void configureEdgeOptions(
+            EdgeOptions options,
+            boolean headless) {
+
+        if (headless) {
+
+            options.addArguments("--headless=new");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--window-size=1920,1080");
+        }
+
+        options.addArguments("--disable-notifications");
+        options.addArguments("--start-maximized");
+    }
+
+
+    // =========================================================
+    // GET DRIVER
+    // =========================================================
+
+    public static WebDriver getDriver() {
+
+        WebDriver webDriver = driver.get();
+
+        if (webDriver == null) {
+
+            throw new IllegalStateException(
+                    "WebDriver is not initialized for the current thread.");
+        }
+
+        return webDriver;
+    }
+
+
+    // =========================================================
+    // CHECK DRIVER
+    // =========================================================
+
+    public static boolean isDriverInitialized() {
+
+        return driver.get() != null;
+    }
+
+
+    // =========================================================
+    // QUIT DRIVER
+    // =========================================================
 
     public static void quitDriver() {
 
         WebDriver webDriver = driver.get();
 
         if (webDriver != null) {
-            webDriver.quit();
-            driver.remove();
+
+            try {
+
+                System.out.println(
+                        "Quitting WebDriver...");
+
+                webDriver.quit();
+
+            } catch (Exception e) {
+
+                System.err.println(
+                        "Error while quitting WebDriver: "
+                                + e.getMessage());
+
+            } finally {
+
+                driver.remove();
+            }
         }
     }
 }
