@@ -8,8 +8,8 @@ import utilities.BaseClass;
 public class sampleTest extends BaseClass {
 
 	@Test
-	public void simpleTest() {
+	public void simpleTest() throws InterruptedException {
 		Homepage hp = new Homepage(driver);
-	//	hp.validateHomepageContent();
+		hp.validateHomepageContent();
 	}
 }
