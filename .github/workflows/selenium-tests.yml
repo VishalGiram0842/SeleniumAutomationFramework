@@ -1,0 +1,111 @@
+name: Selenium Automation Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+  workflow_dispatch:
+
+jobs:
+
+  selenium-tests:
+
+    name: Selenium TestNG Tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ----------------------------------------
+      # 1. Checkout Repository
+      # ----------------------------------------
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+
+      # ----------------------------------------
+      # 2. Setup Java
+      # ----------------------------------------
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+
+      # ----------------------------------------
+      # 3. Verify Java & Maven
+      # ----------------------------------------
+      - name: Verify Java
+        run: java -version
+
+      - name: Verify Maven
+        run: mvn -version
+
+
+      # ----------------------------------------
+      # 4. Run Selenium Tests
+      # ----------------------------------------
+      - name: Run Selenium Tests
+        run: |
+          mvn clean test \
+            -Dbrowser=chrome \
+            -Dheadless=true
+        continue-on-error: true
+
+
+      # ----------------------------------------
+      # 5. Display Report Files
+      # ----------------------------------------
+      - name: List Reports
+        if: always()
+        run: |
+          echo "===== Reports ====="
+          find Reports -maxdepth 3 -type f || true
+
+          echo "===== Allure Results ====="
+          find Reports/allure-results -type f || true
+
+
+      # ----------------------------------------
+      # 6. Upload Extent Report
+      # ----------------------------------------
+      - name: Upload Extent Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report
+          path: Reports/ExtentReport.html
+          if-no-files-found: warn
+
+
+      # ----------------------------------------
+      # 7. Upload Allure Results
+      # ----------------------------------------
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: Reports/allure-results
+          if-no-files-found: warn
+
+
+      # ----------------------------------------
+      # 8. Upload Screenshots
+      # ----------------------------------------
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots
+          path: Reports/**/*.png
+          if-no-files-found: ignore
